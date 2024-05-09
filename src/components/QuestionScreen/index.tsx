@@ -30,7 +30,7 @@ const QuizContainer = styled.div<{ selectedAnswer: boolean }>`
       svg {
         path {
           fill: ${({ selectedAnswer, theme }) =>
-            selectedAnswer ? `${theme.colors.buttonText}` : `${theme.colors.darkGray}`};
+    selectedAnswer ? `${theme.colors.buttonText}` : `${theme.colors.darkGray}`};
         }
       }
     }
@@ -71,6 +71,7 @@ const QuestionScreen: FC = () => {
 
   const {
     questions,
+    setQuestions,
     quizDetails,
     result,
     setResult,
@@ -82,44 +83,59 @@ const QuestionScreen: FC = () => {
 
   const currentQuestion = questions[activeQuestion]
 
-  const { question, type, choices, code, image, correctAnswers } = currentQuestion
+  const { type, correctAnswers } = currentQuestion
 
   const onClickNext = () => {
-    const isMatch: boolean =
-      selectedAnswer.length === correctAnswers.length &&
-      selectedAnswer.every((answer) => correctAnswers.includes(answer))
+    // const isMatch: boolean =
+    //   selectedAnswer.length === correctAnswers.length &&
+    //   selectedAnswer.every((answer) => correctAnswers.includes(answer))
 
-    // adding selected answer, and if answer matches key to result array with current question
-    setResult([...result, { ...currentQuestion, selectedAnswer, isMatch }])
+    // // adding selected answer, and if answer matches key to result array with current question
 
-    if (activeQuestion !== questions.length - 1) {
-      setActiveQuestion((prev) => prev + 1)
-    } else {
-      // how long does it take to finish the quiz
-      const timeTaken = quizDetails.totalTime - timer
-      setEndTime(timeTaken)
-      setShowResultModal(true)
-    }
-    setSelectedAnswer([])
+    // if (activeQuestion !== questions.length - 1) {
+    //   setActiveQuestion((prev) => prev + 1)
+    // } else {
+    //   // how long does it take to finish the quiz
+    const timeTaken = quizDetails.totalTime - timer
+    setEndTime(timeTaken)
+    setShowResultModal(true)
+    // }
+    // setSelectedAnswer([])
   }
 
-  const handleAnswerSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAnswerSelection = (e: React.ChangeEvent<HTMLInputElement>, index: number, type: string, question: string) => {
     const { name, checked } = e.target
 
-    if (type === 'MAQs') {
-      if (selectedAnswer.includes(name)) {
-        setSelectedAnswer((prevSelectedAnswer) =>
-          prevSelectedAnswer.filter((element) => element !== name)
-        )
-      } else {
-        setSelectedAnswer((prevSelectedAnswer) => [...prevSelectedAnswer, name])
-      }
-    }
+    // if (type === 'MAQs') {
+    //   console.log("========>",name, selectedAnswer);
+    //   if (selectedAnswer.includes(name)) {
+    //     setSelectedAnswer((prevSelectedAnswer) => {
+    //       return prevSelectedAnswer.filter((element) => element !== name)
+    //     }
+    //     )
+    //   } else {
+    //     setSelectedAnswer((prevSelectedAnswer) => [...prevSelectedAnswer, name])
+    //   }
+    // }
 
+    console.log("selectedAnswer ==> ", questions, name, index, e, question, result);
     if (type === 'MCQs' || type === 'boolean') {
-      if (checked) {
-        setSelectedAnswer([name])
-      }
+      setQuestions((questions) => {
+        return questions.map((ques) => ques.question == question ? { ...ques, userSelection: [name], isMatch: [name].every((answer) => correctAnswers.includes(answer)) } : ques)
+      })
+      // const question = questions.find((ques) => ques.question == name)
+      // setResult([...result, { ...question, selectedAnswer: name, isMatch }])
+
+      // if (checked) {
+      //   if (selectedAnswer.includes(name)) {
+      //     setSelectedAnswer((prevSelectedAnswer) => {
+      //       return prevSelectedAnswer.filter((element) => element !== name)
+      //     }
+      //     )
+      //   } else {
+      //     setSelectedAnswer((prevSelectedAnswer) => [...prevSelectedAnswer, name])
+      //   }
+      // }
     }
   }
 
@@ -140,31 +156,36 @@ const QuestionScreen: FC = () => {
 
   return (
     <PageCenter>
-      <LogoContainer>
-        <AppLogo />
-      </LogoContainer>
       <QuizContainer selectedAnswer={selectedAnswer.length > 0}>
-        <QuizHeader
-          activeQuestion={activeQuestion}
-          totalQuestions={quizDetails.totalQuestions}
-          timer={timer}
-        />
-        <Question
-          question={question}
-          code={code}
-          image={image}
-          choices={choices}
-          type={type}
-          handleAnswerSelection={handleAnswerSelection}
-          selectedAnswer={selectedAnswer}
-        />
+        {questions.map(
+          (
+            {
+              question,
+              choices,
+              code,
+              image,
+              userSelection
+            },
+            index: number
+          ) =>
+            <Question
+              questionNumber={index + 1}
+              question={question}
+              code={code}
+              image={image}
+              choices={choices}
+              type={type}
+              handleAnswerSelection={handleAnswerSelection}
+              selectedAnswer={userSelection}
+            />
+        )}
         <ButtonWrapper>
           <Button
-            text={activeQuestion === questions.length - 1 ? 'Finish' : 'Next'}
+            text={'Finish'}
             onClick={onClickNext}
             icon={<Next />}
             iconPosition="right"
-            disabled={selectedAnswer.length === 0}
+            disabled={questions.filter((question) => question.userSelection).length ? false : true}
           />
         </ButtonWrapper>
       </QuizContainer>
@@ -172,7 +193,7 @@ const QuestionScreen: FC = () => {
       {(showTimerModal || showResultModal) && (
         <ModalWrapper
           title={showResultModal ? 'Done!' : 'Your time is up!'}
-          subtitle={`You have attempted ${result.length} questions in total.`}
+          subtitle={`You have attempted ${questions.filter((question) => question.userSelection).length} questions in total.`}
           onClick={handleModal}
           icon={showResultModal ? <CheckIcon /> : <TimerIcon />}
           buttonTitle="SHOW RESULT"

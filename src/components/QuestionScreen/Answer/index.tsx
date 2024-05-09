@@ -8,7 +8,7 @@ const AnswerStyle = styled.div<{ highlightAnswer: boolean }>`
   font-weight: 400;
   border: 1px solid
     ${({ highlightAnswer, theme }) =>
-      highlightAnswer ? `${theme.colors.themeColor}` : `${theme.colors.border}`};
+    highlightAnswer ? `${theme.colors.themeColor}` : `${theme.colors.border}`};
   background-color: ${({ highlightAnswer, theme }) =>
     highlightAnswer ? `${theme.colors.selectedAnswer}` : `${theme.colors.answerBg}`};
   border-radius: 16px;
@@ -43,7 +43,7 @@ interface AnswerProps {
   index: number
   choice: string
   type: string
-  selectedAnswer: string[]
+  selectedAnswer?: string[]
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
@@ -52,19 +52,19 @@ const Answer: FC<AnswerProps> = ({ onChange, index, choice, type, selectedAnswer
   const label = String.fromCharCode(65 + index)
 
   return (
-    <AnswerStyle key={index} highlightAnswer={selectedAnswer.includes(choice)}>
+    <AnswerStyle key={index} highlightAnswer={selectedAnswer ? selectedAnswer.includes(choice) : false}>
       <AnswerLabel>
         <ChoiceLabel>{label}.</ChoiceLabel>
         <input
           name={choice}
           // radio is for checked one option and checkbox is for checked multiple options
           type={type === 'MAQs' ? 'checkbox' : 'radio'}
-          checked={selectedAnswer.includes(choice)}
+          checked={selectedAnswer ? selectedAnswer.includes(choice) : false}
           onChange={onChange}
         />
         {choice}
       </AnswerLabel>
-    </AnswerStyle>
+    </AnswerStyle >
   )
 }
 

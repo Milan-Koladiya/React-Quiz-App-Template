@@ -19,6 +19,7 @@ export type Question = {
   score: number
   code?: string
   image?: string
+  userSelection?: string[]
 }
 
 export type Topic = {

@@ -25,23 +25,28 @@ interface ResultOverviewProps {
 }
 
 const ResultOverview: FC<ResultOverviewProps> = ({ result }) => {
-  const { quizDetails, endTime } = useQuiz()
+  const { quizDetails, questions, endTime } = useQuiz()
 
-  const totalQuestionAttempted = result.length
-
-  const obtainedScore = result
-    .filter((item) => item.isMatch && typeof item.score === 'number')
-    .reduce((accumulator, currentValue) => accumulator + (currentValue.score || 0), 0)
 
   // Passed if 60 or more than 60% marks
-  const calculateStatus =
-    (obtainedScore / quizDetails.totalScore) * 100 >= 60 ? 'Passed' : 'Failed'
+  const marks = () => {
+    let result = 0;
+    questions.map((question) => {
+      if (question.userSelection) {
+        const isMatch = question.userSelection.every((answer) => question?.correctAnswers.includes(answer));
+        isMatch ? result++ : result = result - 0.25
+      }
+    })
+    return result;
+    // (obtainedScore / quizDetails.totalScore) * 100 >= 60 ? 'Passed' : 'Failed'
+  }
+  const obtainedScore = marks()
 
   return (
     <ResultOverviewStyle>
       <p>
         You attempted questions:{' '}
-        <HighlightedText> {totalQuestionAttempted} </HighlightedText>/{' '}
+        <HighlightedText> {questions.filter((question) => question.userSelection).length} </HighlightedText>/{' '}
         {quizDetails.totalQuestions}
       </p>
       <p>
@@ -51,9 +56,9 @@ const ResultOverview: FC<ResultOverviewProps> = ({ result }) => {
       <p>
         Time Spent:<HighlightedText> {convertSeconds(endTime)} </HighlightedText>
       </p>
-      <p>
+      {/* <p>
         Status:<HighlightedText> {calculateStatus}</HighlightedText>
-      </p>
+      </p> */}
     </ResultOverviewStyle>
   )
 }
