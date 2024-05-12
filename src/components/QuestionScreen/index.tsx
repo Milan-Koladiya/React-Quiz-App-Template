@@ -12,6 +12,7 @@ import Button from '../ui/Button'
 import ModalWrapper from '../ui/ModalWrapper'
 import Question from './Question'
 import QuizHeader from './QuizHeader'
+import { useNavigate } from 'react-router-dom'
 
 const QuizContainer = styled.div<{ selectedAnswer: boolean }>`
   width: 900px;
@@ -64,6 +65,7 @@ const ButtonWrapper = styled.div`
 `
 
 const QuestionScreen: FC = () => {
+  const navigate = useNavigate();
   const [activeQuestion, setActiveQuestion] = useState<number>(0)
   const [selectedAnswer, setSelectedAnswer] = useState<string[]>([])
   const [showTimerModal, setShowTimerModal] = useState<boolean>(false)
@@ -75,7 +77,6 @@ const QuestionScreen: FC = () => {
     quizDetails,
     result,
     setResult,
-    setCurrentScreen,
     timer,
     setTimer,
     setEndTime,
@@ -140,16 +141,17 @@ const QuestionScreen: FC = () => {
   }
 
   const handleModal = () => {
-    setCurrentScreen(ScreenTypes.ResultScreen)
+    // setCurrentScreen(ScreenTypes.ResultScreen)
+    navigate('/result')
     document.body.style.overflow = 'auto'
   }
 
   // to prevent scrolling when modal is opened
   useEffect(() => {
-    if (showTimerModal || showResultModal) {
+    if (showResultModal) {
       document.body.style.overflow = 'hidden'
     }
-  }, [showTimerModal, showResultModal])
+  }, [showResultModal])
 
   // timer hooks, handle conditions related to time
   useTimer(timer, quizDetails, setEndTime, setTimer, setShowTimerModal, showResultModal)
@@ -190,7 +192,7 @@ const QuestionScreen: FC = () => {
         </ButtonWrapper>
       </QuizContainer>
       {/* timer or finish quiz modal*/}
-      {(showTimerModal || showResultModal) && (
+      {(showResultModal) && (
         <ModalWrapper
           title={showResultModal ? 'Done!' : 'Your time is up!'}
           subtitle={`You have attempted ${questions.filter((question) => question.userSelection).length} questions in total.`}

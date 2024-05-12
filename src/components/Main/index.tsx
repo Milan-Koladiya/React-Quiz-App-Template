@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import ReactGA from "react-ga4";
 
 import { useQuiz } from '../../context/QuizContext'
 import { ScreenTypes } from '../../types'
@@ -10,7 +11,7 @@ import ResultScreen from '../ResultScreen'
 import SplashScreen from '../SplashScreen'
 
 function Main() {
-  const { currentScreen, setCurrentScreen } = useQuiz()
+  const { currentScreen, setCurrentScreen } = useQuiz();
 
   useEffect(() => {
     setTimeout(() => {

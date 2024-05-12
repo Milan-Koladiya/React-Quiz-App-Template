@@ -119,7 +119,7 @@ const Score = styled.span<{ right: boolean }>`
 `
 
 const ResultScreen: FC = () => {
-  const { result } = useQuiz()
+  const { result, questions } = useQuiz()
 
   const onClickRetry = () => {
     refreshPage()
@@ -132,7 +132,7 @@ const ResultScreen: FC = () => {
       </LogoContainer>
       <InnerContainer>
         <ResultOverview result={result} />
-        {result.map(
+        {questions.map(
           (
             {
               question,
@@ -140,12 +140,13 @@ const ResultScreen: FC = () => {
               code,
               image,
               correctAnswers,
-              selectedAnswer,
+              userSelection,
               score,
-              isMatch,
             },
             index: number
           ) => {
+            const isMatch = userSelection && userSelection.every((answer) => correctAnswers.includes(answer));
+
             return (
               <QuestionContainer key={question}>
                 <ResizableBox width="90%">
@@ -161,9 +162,9 @@ const ResultScreen: FC = () => {
                         // Convert index to alphabet character
                         const label = String.fromCharCode(65 + index)
                         const correct =
-                          selectedAnswer.includes(ans) && correctAnswers.includes(ans)
+                          userSelection && userSelection.includes(ans) && correctAnswers.includes(ans)
                         const wrong =
-                          selectedAnswer.includes(ans) && !correctAnswers.includes(ans)
+                          userSelection && userSelection.includes(ans) && !correctAnswers.includes(ans)
 
                         return (
                           <Answer key={ans} correct={correct} wrong={wrong}>
@@ -179,7 +180,7 @@ const ResultScreen: FC = () => {
                     )}
                   </div>
                 </ResizableBox>
-                <Score right={isMatch}>{`Score ${isMatch ? score : 0}`}</Score>
+                {isMatch !== undefined && <Score right={isMatch ? isMatch : false}>{`Score ${isMatch ? 1 : -0.25}`}</Score>}
               </QuestionContainer>
             )
           }

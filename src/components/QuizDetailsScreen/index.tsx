@@ -12,6 +12,7 @@ import { ScreenTypes } from '../../types'
 import { convertSeconds } from '../../utils/helpers'
 
 import Button from '../ui/Button'
+import { useNavigate } from 'react-router-dom'
 
 const AppTitle = styled.h2`
   font-weight: 700;
@@ -36,12 +37,15 @@ const DetailText = styled.p`
 `
 
 const QuizDetailsScreen = () => {
+  const navigate = useNavigate();
   const { setCurrentScreen, quizDetails } = useQuiz()
 
   const { selectedQuizTopic, totalQuestions, totalScore, totalTime } = quizDetails
 
   const goToQuestionScreen = () => {
-    setCurrentScreen(ScreenTypes.QuestionScreen)
+    navigate(`/quetion-screen?topic=${selectedQuizTopic}`);
+    // setCurrentScreen(ScreenTypes.QuestionScreen)
+
   }
 
   return (
@@ -50,7 +54,7 @@ const QuizDetailsScreen = () => {
         <LogoContainer>
           <AppLogo />
         </LogoContainer>
-        <AppTitle>XEVEN QUIZ</AppTitle>
+        <AppTitle>Adhikari Adda</AppTitle>
         <DetailTextContainer>
           <DetailText>
             Selected Quiz Topic: <HighlightedText>{selectedQuizTopic}</HighlightedText>

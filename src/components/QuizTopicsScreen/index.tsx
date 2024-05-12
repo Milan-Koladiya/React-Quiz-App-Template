@@ -13,6 +13,7 @@ import {
 import { ScreenTypes } from '../../types'
 
 import Button from '../ui/Button'
+import { useNavigate } from 'react-router-dom'
 
 const Heading = styled.h2`
   font-size: 32px;
@@ -79,10 +80,12 @@ const SelectButtonText = styled.span`
 `
 
 const QuizTopicsScreen: React.FC = () => {
+  const navigate = useNavigate();
   const { quizTopic, selectQuizTopic, setCurrentScreen } = useQuiz()
 
   const goToQuizDetailsScreen = () => {
-    setCurrentScreen(ScreenTypes.QuizDetailsScreen)
+    navigate(`/detail-screen?topic=${quizTopic}`);
+    // setCurrentScreen(ScreenTypes.QuizDetailsScreen)
   }
 
   return (
@@ -92,7 +95,7 @@ const QuizTopicsScreen: React.FC = () => {
           <AppLogo />
         </LogoContainer>
         <Heading>
-          WELCOME TO <HighlightedText> XEVEN QUIZ</HighlightedText>
+          WELCOME TO <HighlightedText> Adhikari Adda</HighlightedText>
         </Heading>
         <DetailText>Select topic below to start your Quiz.</DetailText>
         <SelectButtonContainer>
